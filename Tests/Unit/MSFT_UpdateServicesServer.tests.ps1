@@ -78,10 +78,29 @@ try
 
             Context 'server should be configured.' {
 
-                It 'calling Get should not throw and mocks' {
-                    { $Script:resource = Get-TargetResource -Ensure 'Present' -verbose } | Should -Not -Throw
+                $DSCGetValues = @{
+                    SQLServer                         = 'SQLServer'
+                    ContentDir                        = 'C:\WSUSContent\'
+                    UpdateImprovementProgram          = $true
+                    UpstreamServerName                = ''
+                    UpstreamServerPort                = $null
+                    UpstreamServerSSL                 = $null
+                    UpstreamServerReplica             = $null
+                    ProxyServerName                   = ''
+                    ProxyServerPort                   = $null
+                    ProxyServerCredentialUsername     = $null
+                    ProxyServerBasicAuthentication    = $null
+                    Languages                         = '*'
+                    Products                          = @('Windows', 'Office')
+                    Classifications                   = '*'
+                    SynchronizeAutomatically          = $true
+                    SynchronizeAutomaticallyTimeOfDay = '04:00:00'
+                    SynchronizationsPerDay            = 24
+                    ClientTargetingMode               = "Client"
+                }
 
-                    Should -Invoke Get-ItemProperty -Exactly 2
+                It 'calling Get should not throw' {
+                    { $Script:resource = Get-TargetResource -Ensure 'Present' -verbose } | Should not throw
                 }
 
                 It 'sets the value for Ensure' {
@@ -147,6 +166,7 @@ try
                     $DSCTestValues.Remove('Ensure')
                     $DSCTestValues.Add('Ensure', 'Present')
 
+                    Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -RemoveParameterType 'WsusServer' -Verbose
                     Mock -CommandName Get-TargetResource -MockWith { $DSCTestValues } -Verifiable
                     $script:result = $null
                 }
@@ -172,6 +192,10 @@ try
                     $DSCTestValues.Add('Ensure', 'Absent')
 
                     Mock -CommandName Get-TargetResource -MockWith { $DSCTestValues } -Verifiable
+                    Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -ParameterFilter {
+                        $ProductsList -eq @('Windows', 'Office') -and `
+                        $null -eq (Compare-Object -ReferenceObject $WsusServer -eq (Get-WsusServer))
+                    }
                     $script:result = $null
                 }
 
@@ -189,7 +213,12 @@ try
             Context 'server should be configured correctly but is not' {
                 BeforeAll {
                     $DSCTestValues.Remove('Ensure')
+
                     Mock -CommandName Get-TargetResource -MockWith { $DSCTestValues } -Verifiable
+                    Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -ParameterFilter {
+                        $ProductsList -eq @('Windows', 'Office') -and `
+                        $null -eq (Compare-Object -ReferenceObject $WsusServer -eq (Get-WsusServer))
+                    }
 
                     $script:result = $null
                 }
@@ -231,9 +260,13 @@ try
                             $DSCTestValues.Remove("$setting")
                             $DSCTestValues
                         }
-                    }
 
-                    $script:result = $null
+                        Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -ParameterFilter {
+                            $ProductsList -eq @('Windows', 'Office')
+                        }
+
+                        $script:result = $null
+                    }
 
                     It "calling test with change to <_> should not throw" {
                         { $script:result = Test-TargetResource @DSCTestValues -verbose } | Should -Not -Throw
@@ -301,6 +334,10 @@ try
                     $DSCTestValues.Remove('Ensure')
 
                     Mock -CommandName Get-TargetResource -MockWith { $DSCGetValues } -Verifiable
+                    Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -ParameterFilter {
+                        $ProductsList -eq 'Windows Server*' -and `
+                        $null -eq (Compare-Object -ReferenceObject $WsusServer -eq (Get-WsusServer))
+                    }
 
                     $script:result = $null
                 }

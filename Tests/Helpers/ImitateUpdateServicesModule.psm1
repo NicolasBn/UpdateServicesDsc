@@ -1,7 +1,8 @@
 function Get-WsusServerTemplate
 {
     $WsusServer = [pscustomobject] @{
-        Name = 'ServerName'
+            PSTypesName = 'Microsoft.UpdateServices.Internal.BaseApi.UpdateServer'
+            Name = 'ServerName'
         }
 
     $ApprovalRule = [scriptblock]{
@@ -105,6 +106,7 @@ function Get-WsusServerTemplate
             UpStreamServerSSL =  $false
             MURollupOptin = $true
             AllUpdateLanguagesEnabled = $true
+            TargetingMode = 'Client'
         }
         $Configuration | Add-Member -MemberType ScriptMethod -Name GetEnabledUpdateLanguages -Value {}
 
