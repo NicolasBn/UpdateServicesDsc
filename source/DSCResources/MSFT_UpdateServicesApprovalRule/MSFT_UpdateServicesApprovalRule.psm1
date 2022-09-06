@@ -18,7 +18,9 @@
 
 # Load Common Module
 $script:resourceHelperModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\DscResource.Common'
+$script:usDSCCommonModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\UpdateServicesDsc.Common'
 Import-Module -Name $script:resourceHelperModulePath
+Import-Module -Name $script:usDSCCommonModulePath
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US' -FileName 'MSFT_UpdateServicesApprovalRule.strings.psd1'
 
 
