@@ -76,6 +76,27 @@ try
 
             Context 'server should be configured.' {
 
+                $DSCGetValues = @{
+                    SQLServer                         = 'SQLServer'
+                    ContentDir                        = 'C:\WSUSContent\'
+                    UpdateImprovementProgram          = $true
+                    UpstreamServerName                = ''
+                    UpstreamServerPort                = $null
+                    UpstreamServerSSL                 = $null
+                    UpstreamServerReplica             = $null
+                    ProxyServerName                   = ''
+                    ProxyServerPort                   = $null
+                    ProxyServerCredentialUsername     = $null
+                    ProxyServerBasicAuthentication    = $null
+                    Languages                         = '*'
+                    Products                          = @('Windows', 'Office')
+                    Classifications                   = '*'
+                    SynchronizeAutomatically          = $true
+                    SynchronizeAutomaticallyTimeOfDay = '04:00:00'
+                    SynchronizationsPerDay            = 24
+                    ClientTargetingMode               = "Client"
+                }
+
                 It 'calling Get should not throw' {
                     { $Script:resource = Get-TargetResource -Ensure 'Present' -verbose } | Should not throw
                 }
@@ -84,10 +105,10 @@ try
                     $Script:resource.Ensure | Should be 'Present'
                 }
 
-                foreach ($setting in $DSCSetValues.Keys)
+                foreach ($setting in $DSCGetValues.Keys)
                 {
                     It "returns $setting in Get results" {
-                        $Script:resource.$setting | Should be $DSCGetReturnValues.$setting
+                        $Script:resource.$setting | Should be $DSCGetValues.$setting
                     }
                 }
 
@@ -151,6 +172,8 @@ try
                 $DSCTestValues.Remove('Ensure')
                 $DSCTestValues.Add('Ensure', 'Present')
 
+                #New-MockObject -Type 'Microsoft.UpdateServices.Internal.BaseApi.UpdateServer' | Out-Null
+                Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -RemoveParameterType 'WsusServer' -Verbose
                 Mock -CommandName Get-TargetResource -MockWith { $DSCTestValues } -Verifiable
 
                 $script:result = $null
@@ -174,6 +197,10 @@ try
                 $DSCTestValues.Add('Ensure', 'Absent')
 
                 Mock -CommandName Get-TargetResource -MockWith { $DSCTestValues } -Verifiable
+                Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -ParameterFilter {
+                    $ProductsList -eq @('Windows', 'Office') -and `
+                    $null -eq (Compare-Object -ReferenceObject $WsusServer -eq (Get-WsusServer))
+                }
 
                 $script:result = $null
 
@@ -195,6 +222,10 @@ try
                 $DSCTestValues.Remove('Ensure')
 
                 Mock -CommandName Get-TargetResource -MockWith { $DSCTestValues } -Verifiable
+                Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -ParameterFilter {
+                    $ProductsList -eq @('Windows', 'Office') -and `
+                    $null -eq (Compare-Object -ReferenceObject $WsusServer -eq (Get-WsusServer))
+                }
 
                 $script:result = $null
 
@@ -218,6 +249,9 @@ try
 
                 # Settings not currently tested: ProxyServerUserName, ProxyServerCredential, ProxyServerBasicAuthentication, 'Languages', 'Products', 'Classifications', 'SynchronizeAutomatically'
                 $settingsList = 'UpdateImprovementProgram', 'UpstreamServerName', 'UpstreamServerPort', 'UpstreamServerSSL', 'UpstreamServerReplica', 'ProxyServerName', 'ProxyServerPort', 'SynchronizeAutomaticallyTimeOfDay', 'SynchronizationsPerDay'
+                Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -ParameterFilter {
+                    $ProductsList -eq @('Windows', 'Office')
+                }
                 foreach ($setting in $settingsList)
                 {
                     Mock -CommandName Get-TargetResource -MockWith {
@@ -293,6 +327,10 @@ try
                     $DSCTestValues.Remove('Ensure')
 
                     Mock -CommandName Get-TargetResource -MockWith { $DSCGetValues } -Verifiable
+                    Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -ParameterFilter {
+                        $ProductsList -eq 'Windows Server*' -and `
+                        $null -eq (Compare-Object -ReferenceObject $WsusServer -eq (Get-WsusServer))
+                    }
 
                     $script:result = $null
                 }
