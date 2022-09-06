@@ -20,7 +20,7 @@ Describe "Tests installation with all products" {
         }
 
         It "Should product are correctly configured" {
-            $AllProducts = $script:wuServer.GetUpdateCategories().Title | Where-Object {$_ -in @('Windows','Office')}
+            $AllProducts = $script:wuServer.GetUpdateCategories().Title
 
             ($AllProducts | Measure-Object).Count | Should -Be ($script:wuServer.GetSubscription().GetUpdateCategories().Title | Measure-Object ).Count
 
