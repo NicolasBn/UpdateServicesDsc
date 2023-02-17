@@ -175,6 +175,7 @@ try
                     { $script:result = Test-TargetResource @DSCTestValues -verbose } | Should -Not -Throw
 
                     Should -Invoke Get-TargetResource -Exactly 1
+                    Should -Invoke Get-UpdateServicesDscProduct  -Exactly 1
                 }
 
                 It "result should be true" {
@@ -203,6 +204,7 @@ try
                     { $script:result = Test-TargetResource @DSCTestValues -verbose } | Should -Not -Throw
 
                     Should -Invoke Get-TargetResource -Exactly 1
+                    Should -Invoke Get-UpdateServicesDscProduct -Exactly 1
                 }
 
                 It "result should be true" {
@@ -227,6 +229,7 @@ try
                     { $script:result = Test-TargetResource @DSCTestValues -Ensure 'Present' -verbose } | Should -Not -Throw
 
                     Should -Invoke Get-TargetResource -Exactly 1
+                    Should -Invoke Get-UpdateServicesDscProduct -Exactly 1
                 }
 
                 It "result should be false" {
@@ -272,6 +275,7 @@ try
                         { $script:result = Test-TargetResource @DSCTestValues -verbose } | Should -Not -Throw
 
                         Should -Invoke Get-TargetResource -Exactly 1
+                        Should -Invoke Get-UpdateServicesDscProduct -Exactly 1
                     }
 
                     It "result should be false when <_> has changed" {
