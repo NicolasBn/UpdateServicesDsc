@@ -1,6 +1,6 @@
 $script:resourceHelperModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\DscResource.Common'
 Import-Module -Name $script:resourceHelperModulePath -ErrorAction Stop
-Import-Module -Name WindowsUpdateProvider -ErrorAction Stop
+#Import-Module -Name WindowsUpdateProvider -ErrorAction Stop
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US' -FileName 'UpdateServicesDSC.Common.strings.psd1'
 
 function Get-UpdateServicesDscProduct

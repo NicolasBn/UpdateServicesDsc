@@ -11,7 +11,7 @@
     'powershell-yaml'           = 'latest'
     InvokeBuild                 = 'latest'
     PSScriptAnalyzer            = 'latest'
-    Pester                      = '5.3.3'
+    Pester                      = 'latest'
     Plaster                     = 'latest'
     ModuleBuilder               = '1.0.0'
     ChangelogManagement         = 'latest'

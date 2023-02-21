@@ -100,7 +100,7 @@ try
                 }
 
                 It 'calling Get should not throw' {
-                    { $Script:resource = Get-TargetResource -Ensure 'Present' -verbose } | Should not throw
+                    { $Script:resource = Get-TargetResource -Ensure 'Present' -verbose } | Should -Not -Throw
                 }
 
                 It 'sets the value for Ensure' {
@@ -166,7 +166,7 @@ try
                     $DSCTestValues.Remove('Ensure')
                     $DSCTestValues.Add('Ensure', 'Present')
 
-                    Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -RemoveParameterType 'WsusServer' -Verbose
+                    Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -RemoveParameterType 'WsusServer' -Verbose -ModuleName UpdateServicesDsc.Common
                     Mock -CommandName Get-TargetResource -MockWith { $DSCTestValues } -Verifiable
                     $script:result = $null
                 }
@@ -196,7 +196,7 @@ try
                     Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -ParameterFilter {
                         $ProductsList -eq @('Windows', 'Office') -and `
                         $null -eq (Compare-Object -ReferenceObject $WsusServer -eq (Get-WsusServer))
-                    }
+                    } -RemoveParameterType 'WsusServer'
                     $script:result = $null
                 }
 
@@ -220,7 +220,7 @@ try
                     Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -ParameterFilter {
                         $ProductsList -eq @('Windows', 'Office') -and `
                         $null -eq (Compare-Object -ReferenceObject $WsusServer -eq (Get-WsusServer))
-                    }
+                    } -RemoveParameterType 'WsusServer'
 
                     $script:result = $null
                 }
@@ -266,7 +266,7 @@ try
 
                         Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -ParameterFilter {
                             $ProductsList -eq @('Windows', 'Office')
-                        }
+                        } -RemoveParameterType 'WsusServer'
 
                         $script:result = $null
                     }
@@ -341,7 +341,7 @@ try
                     Mock -CommandName Get-UpdateServicesDscProduct -Verifiable -MockWith {} -ParameterFilter {
                         $ProductsList -eq 'Windows Server*' -and `
                         $null -eq (Compare-Object -ReferenceObject $WsusServer -eq (Get-WsusServer))
-                    }
+                    } -RemoveParameterType 'WsusServer'
 
                     $script:result = $null
                 }
